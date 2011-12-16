@@ -82,7 +82,7 @@ object DeployerPlugin extends Plugin {dp =>
         jarOutputStream.putNextEntry(new JarEntry("META-INF/MANIFEST.MF"))
         jarOutputStream.write(("Main-Class: " + mainClass + "\n").getBytes)
 
-
+        println("Installing launcher classes: " + LauncherBinaries.classes.map(_._1).mkString(", "))
         for (clazz <- LauncherBinaries.classes) {
           jarOutputStream.putNextEntry(new JarEntry(clazz._1))
           jarOutputStream.write(clazz._2)

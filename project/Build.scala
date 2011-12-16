@@ -1,31 +1,30 @@
 import sbt._, Keys._, Path._
 
-object Build extends Build {
-  lazy val root = Project("root", file(".")) settings(extraSettings:_*)
+object ProjectDefinition extends Build {
+  lazy val root = Project("xsbt-plugin-deployer", file(".")).settings(extraSettings:_*)
+  lazy val launcher = Project("launcher", file("./launcher"))
 
   def extraSettings = Seq(
     generateLauncherBinariesSettings,
     (sbtPlugin := true)
   )
 
-  lazy val generateLauncherBinaries = InputKey[Unit]("generate-launcher-binaries")
-  def generateLauncherBinariesSettings = generateLauncherBinaries <<=
-                                         sbt.inputTask((_, streams, state) map {(args, s, state) =>
+
+  def generateLauncherBinariesSettings = sourceGenerators in Compile <+=
+                                         (sourceManaged in Compile, streams, compile in Compile in launcher,
+                                         classDirectory in Compile in launcher) map {(sourceManaged, s, _, launcherClassDir) =>
     import s.log
-    if (args.isEmpty) throw new Incomplete(Some("No folder specified"))
-    else {
-      val classes = file(args(0)) * "*.class"
-      log.info("Classes:" + classes)
-      val loadedClasses = classes.get.map(c => c.getName -> IO.readBytes(c))
-      val srcCode = createLauncherBinariesScr(loadedClasses)
 
-      val extracted = Project.extract(state)
-      val mainScalaSourcePath = extracted.get(scalaSource in Compile)
+    val classes = launcherClassDir * "*.class"
+    log.info("Classes from " + launcherClassDir.absolutePath + ":" + classes)
+    val loadedClasses = classes.get.map(c => c.getName -> IO.readBytes(c))
+    val srcCode = createLauncherBinariesScr(loadedClasses)
 
-      val outputFile = mainScalaSourcePath/"LauncherBinaries.scala"
-      IO.write(outputFile, srcCode, java.nio.charset.Charset.forName("UTF-8"))
-    }
-  })
+    val outputFile = sourceManaged/"LauncherBinaries.scala"
+    IO.write(outputFile, srcCode, java.nio.charset.Charset.forName("UTF-8"))
+    log.info("Wrote " + outputFile)
+    Seq(outputFile)
+  }
 
   private def createLauncherBinariesScr(list: Seq[(String, Array[Byte])]): String = {
     val sb = new StringBuilder("package com.belfry.deployer\n\n")
