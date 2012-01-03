@@ -1,14 +1,15 @@
 import sbt._, Keys._, Path._
 
 object ProjectDefinition extends Build {
+  credentials += Credentials(file("/private/belfry/.credentials/.credentials"))
+
   lazy val root = Project("xsbt-plugin-deployer", file(".")).settings(extraSettings:_*)
   lazy val launcher = Project("launcher", file("./launcher")) settings (
     publishTo <<= (version) { version: String =>
       val cloudbees = "https://repository-belfry.forge.cloudbees.com/private/"
       if (version.trim.endsWith("SNAPSHOT")) Some("snapshots" at cloudbees + "snapshots/") 
       else                                   Some("releases"  at cloudbees + "releases/")
-    },
-    credentials += Credentials(file("/private/belfry/.credentials/.credentials"))
+    }
   )
 
   def extraSettings = Seq(
