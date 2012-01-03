@@ -2,9 +2,10 @@ import sbt._, Keys._, Path._
 
 object ProjectDefinition extends Build {
   lazy val root = Project("xsbt-plugin-deployer", file(".")).settings(extraSettings:_*)
-  lazy val launcher = Project("launcher", file("./launcher"))
+  lazy val launcher = Project("launcher", file("./launcher")) settings (javaHome := Some(file("/usr/lib/jvm/java-6-sun/")))
 
   def extraSettings = Seq(
+    javaHome := Some(file("/usr/lib/jvm/java-6-sun/")),
     generateLauncherBinariesSettings,
     (sbtPlugin := true)
   )

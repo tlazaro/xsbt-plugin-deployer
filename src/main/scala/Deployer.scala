@@ -25,7 +25,7 @@ object DeployerPlugin extends Plugin {dp =>
     artifactPath in Compile in packageBin in p get bs.data
   }
 
-  val proguard = TaskKey[Unit]("proguard")
+  val proguard = TaskKey[Unit]("aproguard")
   private def proguardS = proguard <<= (streams, fullClasspath in Compile,
                                         artifactPath in (Compile, packageBin),
                                         proguardScript, proguardConf,
