@@ -8,7 +8,7 @@ object ProjectDefinition extends Build {
       if (version.trim.endsWith("SNAPSHOT")) Some("snapshots" at cloudbees + "snapshots/") 
       else                                   Some("releases"  at cloudbees + "releases/")
     },
-    credentials += Credentials(file(".credentials/.credentials"))
+    credentials += Credentials(file("/private/belfry/.credentials/.credentials"))
   )
 
   def extraSettings = Seq(
