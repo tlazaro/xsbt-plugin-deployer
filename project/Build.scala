@@ -3,8 +3,10 @@ import sbt._, Keys._, Path._
 object ProjectDefinition extends Build {
   lazy val root = Project("xsbt-plugin-deployer", file(".")).settings(extraSettings :_*)
   lazy val launcher = Project("launcher", file("./launcher")) settings (
-    publishTo <<= (version) { version: String =>
-      val cloudbees = "http://repository-belfry.forge.cloudbees.com/"
+    publishMavenStyle := true,
+    publishTo <<= (version) {
+      version: String =>
+      val cloudbees = "https://repository-belfry.forge.cloudbees.com/"
       if (version.trim.endsWith("SNAPSHOT")) Some("snapshot" at cloudbees + "snapshot/") 
       else                                   Some("release"  at cloudbees + "release/")
     },
