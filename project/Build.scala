@@ -11,6 +11,7 @@ object ProjectDefinition extends Build {
       else                                   Some("release"  at cloudbees + "release/")
     },
     credentials += Credentials(file("/private/belfry/.credentials/.credentials"))
+    //credentials += Credentials(Path.userHome / ".credentials")
   )
 
   def extraSettings = Seq(
