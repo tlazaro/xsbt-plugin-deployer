@@ -1,8 +1,11 @@
 import sbt._, Keys._, Path._
 
 object ProjectDefinition extends Build {
-  lazy val root = Project("xsbt-plugin-deployer", file(".")).settings(extraSettings :_*)
-  lazy val launcher = Project("launcher", file("./launcher")) settings (
+  lazy val root = Project("xsbt-plugin-deployer", file(".")) settings(extraSettings ++ publishSettings :_*)
+
+  lazy val launcher = Project("launcher", file("./launcher"))
+
+  lazy val publishSettings = Seq[Project.Setting[_]](
     publishMavenStyle := true,
     publishTo <<= (version) {
       version: String =>
@@ -10,15 +13,17 @@ object ProjectDefinition extends Build {
       if (version.trim.endsWith("SNAPSHOT")) Some("snapshot" at cloudbees + "snapshot/") 
       else                                   Some("release"  at cloudbees + "release/")
     },
-    credentials += Credentials(file("/private/belfry/.credentials/.credentials"))
-    //credentials += Credentials(Path.userHome / ".credentials")
+    {
+      val credsFile = (Path.userHome / ".credentials")
+      credentials += (if (credsFile.exists) Credentials(credsFile)
+                     else Credentials(file("/private/belfry/.credentials/.credentials")))
+    }
   )
 
-  def extraSettings = Seq(
+  lazy val extraSettings = Seq[Project.Setting[_]](
     generateLauncherBinariesSettings,
-    (sbtPlugin := true)
+    sbtPlugin := true
   )
-
 
   def generateLauncherBinariesSettings = sourceGenerators in Compile <+=
                                          (sourceManaged in Compile, streams, compile in Compile in launcher,
