@@ -36,11 +36,14 @@ object DeployerPlugin extends Plugin {dp =>
                        yield "-injars " + file.getAbsolutePath + (if (file != jarPath) "(!META-INF/*)" else "")).mkString("\n")
 //     log.info("Excluded: " + proguardExclude)
     log.info("Injars: " + absoluteIns)
+    val rtJar = java.lang.management.ManagementFactory.getRuntimeMXBean.getBootClassPath.split(java.io.File.pathSeparator).find(_.endsWith("rt.jar"))
+    val libJar = "-libraryjars " + rtJar.get
     val outJar = new java.io.File(jarPath.getParentFile, jarPath.getName.dropRight(4) + "-shrinked.jar").getAbsolutePath
+    log.info("LibJar: " + libJar)
     log.info("Output: " + outJar)
     log.info("Proguard Conf: " + proguardConf.getAbsolutePath)
     try
-      Process(Seq(proguardScript, absoluteIns, "-outjars " + outJar, "@" + proguardConf.getAbsolutePath))! match {
+      Process(Seq(proguardScript, absoluteIns, libJar, "-outjars " + outJar, "@" + proguardConf.getAbsolutePath))! match {
         case 0 =>
         case _ => throw new Incomplete(Some("Proguard returned non cero exit code"))
       }

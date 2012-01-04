@@ -13,10 +13,10 @@ object ProjectDefinition extends Build {
       if (version.trim.endsWith("SNAPSHOT")) Some("snapshot" at cloudbees + "snapshot/") 
       else                                   Some("release"  at cloudbees + "release/")
     },
-    {
-      val credsFile = (Path.userHome / ".credentials")
-      credentials += (if (credsFile.exists) Credentials(credsFile)
-                     else Credentials(file("/private/belfry/.credentials/.credentials")))
+    credentials += {
+        val credsFile = (Path.userHome / ".credentials")
+        (if (credsFile.exists) Credentials(credsFile)
+        else Credentials(file("/private/belfry/.credentials/.credentials")))
     }
   )
 
