@@ -37,7 +37,7 @@ object DeployerPlugin extends Plugin {dp =>
 //     log.info("Excluded: " + proguardExclude)
     log.info("Injars: " + absoluteIns)
     val rtJar = java.lang.management.ManagementFactory.getRuntimeMXBean.getBootClassPath.split(java.io.File.pathSeparator).find(_.endsWith("rt.jar"))
-    val libJar = "-libraryjars " + rtJar.get
+    val libJar = "-libraryjars '" + rtJar.get + "'"
     val outJar = new java.io.File(jarPath.getParentFile, jarPath.getName.dropRight(4) + "-shrinked.jar").getAbsolutePath
     log.info("LibJar: " + libJar)
     log.info("Output: " + outJar)
