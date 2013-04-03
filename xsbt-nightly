@@ -1,0 +1,6 @@
+#!/bin/sh
+
+java -Xverify:none -XX:+UseTLAB -XX:+DoEscapeAnalysis -XX:+CMSClassUnloadingEnabled -Xss2m -Xmx768M \
+     -XX:PermSize=32m -XX:MaxPermSize=512m -XX:+UseG1GC \
+     -Dsbt.boot.directory=project/boot/ \
+     -jar `dirname $0`/sbt-launch-nightly.jar "$@"
